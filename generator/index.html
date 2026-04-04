@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Styvora Landing Page Generator</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    padding:20px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin-bottom:15px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+button{
+    background:black;
+    color:white;
+    padding:12px;
+    width:100%;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#333;
+}
+
+#downloadBtn{
+    margin-top:15px;
+    display:none;
+    background:#28a745;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Styvora Landing Page Generator</h2>
+
+<input type="text" id="title" placeholder="Product Title">
+
+<input type="text" id="image" placeholder="Image File Name (example: image1.jpg)">
+
+<textarea id="description" placeholder="Product Description"></textarea>
+
+<textarea id="specs" placeholder="Specifications (one per line)"></textarea>
+
+<input type="text" id="link" placeholder="Affiliate Link">
+
+<input type="text" id="filename" placeholder="Download File Name (example: index.html)">
+
+<button onclick="generateHTML()">Generate HTML Code</button>
+
+<button id="downloadBtn" onclick="downloadFile()">Download HTML File</button>
+
+</div>
+
+<script>
+let generatedCode = "";
+
+function generateHTML(){
+
+let title = document.getElementById("title").value;
+let image = document.getElementById("image").value;
+let description = document.getElementById("description").value;
+let specs = document.getElementById("specs").value.split("\n");
+let link = document.getElementById("link").value;
+
+let specList = "";
+specs.forEach(item=>{
+    if(item.trim() !== ""){
+        specList += `<li>${item}</li>\n`;
+    }
+});
+
+generatedCode = `
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Styvora | ${title}</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Roboto',sans-serif;background:#f8f8f8;color:#333;line-height:1.6;}
+.container{max-width:720px;margin:0 auto;padding:20px;}
+.styvora-header{text-align:center;padding:18px 0 12px;border-bottom:2px solid #000;margin-bottom:20px;}
+.styvora-name{font-size:28px;font-weight:500;letter-spacing:1px;color:#000;}
+.styvora-tag{font-size:15px;color:#555;margin-top:4px;}
+.product-name{font-size:24px;font-weight:500;text-align:center;margin-bottom:8px;}
+.hero{text-align:center;padding:20px 0;}
+.hero img{width:100%;max-width:420px;border-radius:12px;box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+.description{background:white;padding:25px;border-radius:12px;box-shadow:0 5px 15px rgba(0,0,0,0.08);margin:20px 0;font-size:17px;}
+ul{list-style:none;margin:25px 0;}
+li{padding:8px 0;font-size:16px;position:relative;padding-left:28px;}
+li:before{content:"✔";position:absolute;left:0;color:#28a745;}
+.buy-btn{display:block;width:100%;max-width:320px;margin:30px auto;background:#000;color:white;text-align:center;padding:18px;font-size:20px;font-weight:500;border-radius:50px;text-decoration:none;box-shadow:0 8px 15px rgba(0,0,0,0.15);transition:0.3s;}
+.buy-btn:hover{background:#222;transform:translateY(-2px);}
+footer{text-align:center;padding:30px 0;color:#777;font-size:14px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="styvora-header">
+<div class="styvora-name">Styvora</div>
+<div class="styvora-tag">Women's Fashion & Accessories</div>
+</div>
+
+<header>
+<h1 class="product-name">${title}</h1>
+</header>
+
+<div class="hero">
+<img src="${image}" alt="${title}">
+</div>
+
+<div class="description">
+<p>${description}</p>
+<ul>
+${specList}
+</ul>
+</div>
+
+<a href="${link}" target="_blank" class="buy-btn">
+SHOP NOW – GET THIS PRODUCT
+</a>
+
+<p style="text-align:center;color:#666;font-size:15px;margin-top:10px;">
+Limited stock • Ships fast
+</p>
+
+</div>
+
+<footer>
+Made with ❤️ for Styvora Pinterest<br>
+© Simple Landing Page for Affiliate Marketing
+</footer>
+
+</body>
+</html>
+`;
+
+alert("HTML Code Generated Successfully!");
+document.getElementById("downloadBtn").style.display = "block";
+}
+
+function downloadFile(){
+let filename = document.getElementById("filename").value || "index.html";
+let blob = new Blob([generatedCode], {type: "text/html"});
+let link = document.createElement("a");
+link.href = URL.createObjectURL(blob);
+link.download = filename;
+link.click();
+}
+</script>
+
+</body>
+</html>
