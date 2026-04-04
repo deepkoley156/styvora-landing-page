@@ -43,15 +43,6 @@ button{
 button:hover{
     background:#333;
 }
-#downloadBtn{
-    margin-top:10px;
-    display:none;
-    background:#28a745;
-}
-#publishBtn{
-    margin-top:10px;
-    background:#007bff;
-}
 </style>
 </head>
 <body>
@@ -60,15 +51,14 @@ button:hover{
 <h2>Styvora Landing Page Generator</h2>
 
 <input type="text" id="title" placeholder="Product Title">
-<input type="text" id="image" placeholder="Image File Name (example: image1.jpg)">
+<input type="file" id="imageFile" accept="image/*">
 <textarea id="description" placeholder="Product Description"></textarea>
 <textarea id="specs" placeholder="Specifications (one per line)"></textarea>
 <input type="text" id="link" placeholder="Affiliate Link">
 <input type="text" id="filename" placeholder="Slug (example: product-1)">
 
 <button onclick="generateHTML()">Generate HTML Code</button>
-<button id="downloadBtn" onclick="downloadFile()">Download HTML File</button>
-<button id="publishBtn" onclick="publishToGitHub()">Publish to GitHub (Auto)</button>
+<button onclick="publishToGitHub()">Publish to GitHub (Auto)</button>
 
 </div>
 
@@ -81,12 +71,17 @@ let generatedCode = "";
 function generateHTML(){
 
 let title = document.getElementById("title").value.trim();
-let image = document.getElementById("image").value.trim();
 let description = document.getElementById("description").value
                     .trim()
                     .replaceAll("\n","<br>");
 let specs = document.getElementById("specs").value.split("\n");
 let link = document.getElementById("link").value.trim();
+let slug = document.getElementById("filename").value.trim();
+
+if(!slug){
+    alert("Enter slug first!");
+    return;
+}
 
 let specList = "";
 specs.forEach(item=>{
@@ -108,7 +103,7 @@ generatedCode = `
 
 <h1>${title}</h1>
 
-<img src="${image}" style="max-width:100%;height:auto;border-radius:8px;">
+<img src="images/${slug}.jpg" style="max-width:100%;height:auto;border-radius:8px;">
 
 <p>${description}</p>
 
@@ -127,24 +122,15 @@ BUY NOW
 `;
 
 alert("HTML Generated Successfully!");
-document.getElementById("downloadBtn").style.display = "block";
-}
-
-function downloadFile(){
-let filename = document.getElementById("filename").value.trim() || "index";
-let blob = new Blob([generatedCode], {type: "text/html"});
-let link = document.createElement("a");
-link.href = URL.createObjectURL(blob);
-link.download = filename.replace(".html","") + ".html";
-link.click();
 }
 
 async function publishToGitHub(){
 
 let slug = document.getElementById("filename").value.trim();
+let imageFile = document.getElementById("imageFile").files[0];
 
 if(!slug){
-    alert("Please enter Slug (example: product-1)");
+    alert("Enter slug!");
     return;
 }
 
@@ -153,30 +139,45 @@ if(!generatedCode){
     return;
 }
 
-try{
-
-let response = await fetch(WORKER_API_URL,{
-    method:"POST",
-    headers:{
-        "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-        slug: slug.replace(".html",""),
-        content: generatedCode
-    })
-});
-
-if(!response.ok){
-    throw new Error("Server error: " + response.status);
+if(!imageFile){
+    alert("Select image!");
+    return;
 }
 
-let result = await response.json();
+let reader = new FileReader();
+reader.readAsDataURL(imageFile);
 
-alert("Published Successfully!\n\nPage URL:\n" + result.url);
+reader.onload = async function(){
 
-}catch(error){
-    alert("Publish Failed:\n" + error.message);
-}
+    let base64Image = reader.result.split(",")[1];
+
+    try{
+
+        let response = await fetch(WORKER_API_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                slug: slug,
+                content: generatedCode,
+                imageContent: base64Image
+            })
+        });
+
+        let result = await response.json();
+
+        if(result.success){
+            alert("Published Successfully!\n\n" + result.url);
+        }else{
+            alert("Error: " + result.error);
+        }
+
+    }catch(error){
+        alert("Publish Failed:\n" + error.message);
+    }
+
+};
 
 }
 
