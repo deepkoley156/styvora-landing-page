@@ -1,1 +1,0 @@
-# styvora-landing-page
