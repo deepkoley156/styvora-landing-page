@@ -39,6 +39,7 @@ button{
     border-radius:30px;
     font-size:16px;
     cursor:pointer;
+    margin-bottom:10px;
 }
 button:hover{
     background:#333;
@@ -71,9 +72,8 @@ let generatedCode = "";
 function generateHTML(){
 
 let title = document.getElementById("title").value.trim();
-let description = document.getElementById("description").value
-                    .trim()
-                    .replaceAll("\n","<br>");
+let descriptionRaw = document.getElementById("description").value.trim();
+let description = descriptionRaw.replaceAll("\n","<br>");
 let specs = document.getElementById("specs").value.split("\n");
 let link = document.getElementById("link").value.trim();
 let slug = document.getElementById("filename").value.trim();
@@ -97,31 +97,131 @@ generatedCode = `
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Styvora | ${title}</title>
-<meta name="description" content="${description.replaceAll("<br>"," ")}">
+<meta name="description" content="${descriptionRaw}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter',sans-serif;
+  background:#ffffff;
+  color:#111;
+  line-height:1.6;
+}
+.wrapper{
+  max-width:720px;
+  margin:auto;
+  padding:40px 20px 120px;
+}
+.brand{
+  text-align:center;
+  font-size:14px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:40px;
+  color:#777;
+}
+.product-image{
+  width:100%;
+  border-radius:6px;
+  margin-bottom:35px;
+}
+h1{
+  font-size:26px;
+  font-weight:500;
+  margin-bottom:15px;
+}
+.description{
+  font-size:15px;
+  color:#444;
+  margin-bottom:30px;
+}
+.features{
+  margin-bottom:40px;
+}
+.features li{
+  list-style:none;
+  margin-bottom:10px;
+  font-size:14px;
+  color:#333;
+}
+.features li:before{
+  content:"– ";
+}
+.cta{
+  display:inline-block;
+  padding:14px 36px;
+  border:1px solid #111;
+  text-decoration:none;
+  color:#111;
+  font-weight:500;
+  transition:0.3s ease;
+}
+.cta:hover{
+  background:#111;
+  color:#fff;
+}
+.sticky{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#fff;
+  padding:15px;
+  border-top:1px solid #eee;
+}
+.sticky a{
+  display:block;
+  text-align:center;
+  padding:14px;
+  background:#111;
+  color:#fff;
+  text-decoration:none;
+  font-weight:500;
+}
+@media(min-width:768px){
+  .sticky{display:none;}
+}
+</style>
 </head>
-<body style="font-family:Arial;padding:20px;max-width:700px;margin:auto;">
+
+<body>
+
+<div class="wrapper">
+
+<div class="brand">
+Styvora | Women’s Fashion & Accessories
+</div>
+
+<img src="images/${slug}.jpg" class="product-image">
 
 <h1>${title}</h1>
 
-<img src="images/${slug}.jpg" style="max-width:100%;height:auto;border-radius:8px;">
+<p class="description">
+${description}
+</p>
 
-<p>${description}</p>
-
-<ul>
+<ul class="features">
 ${specList}
 </ul>
 
-<a href="${link}" target="_blank"
-style="display:inline-block;padding:12px 20px;background:black;color:white;
-text-decoration:none;border-radius:30px;margin-top:15px;">
-BUY NOW
+<a href="${link}" target="_blank" class="cta">
+Buy Now
 </a>
+
+</div>
+
+<div class="sticky">
+<a href="${link}" target="_blank">
+Buy Now
+</a>
+</div>
 
 </body>
 </html>
 `;
 
-alert("HTML Generated Successfully!");
+alert("Minimalist Landing Page Generated Successfully!");
 }
 
 async function publishToGitHub(){
