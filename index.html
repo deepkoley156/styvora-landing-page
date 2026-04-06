@@ -64,7 +64,6 @@ button:hover{
 </div>
 
 <script>
-
 const WORKER_API_URL = "https://styvora-publisher.deepkoley156.workers.dev/";
 
 let generatedCode = "";
@@ -193,7 +192,7 @@ h1{
 Styvora | Women’s Fashion & Accessories
 </div>
 
-<img src="images/${slug}.jpg" class="product-image">
+<img src="images/${slug}.jpg" class="product-image" alt="${title}">
 
 <h1>${title}</h1>
 
@@ -228,6 +227,8 @@ async function publishToGitHub(){
 
 let slug = document.getElementById("filename").value.trim();
 let imageFile = document.getElementById("imageFile").files[0];
+let title = document.getElementById("title").value.trim();
+let description = document.getElementById("description").value.trim();
 
 if(!slug){
     alert("Enter slug!");
@@ -241,6 +242,11 @@ if(!generatedCode){
 
 if(!imageFile){
     alert("Select image!");
+    return;
+}
+
+if(!title || !description){
+    alert("Title and description required!");
     return;
 }
 
@@ -260,6 +266,8 @@ reader.onload = async function(){
             },
             body:JSON.stringify({
                 slug: slug,
+                title: title,
+                description: description,
                 content: generatedCode,
                 imageContent: base64Image
             })
@@ -268,7 +276,7 @@ reader.onload = async function(){
         let result = await response.json();
 
         if(result.success){
-            alert("Published Successfully!\n\n" + result.url);
+            alert("Published Successfully!\n\nPage: " + result.url + "\n\nRSS: " + result.rss);
         }else{
             alert("Error: " + result.error);
         }
@@ -280,7 +288,6 @@ reader.onload = async function(){
 };
 
 }
-
 </script>
 
 </body>
