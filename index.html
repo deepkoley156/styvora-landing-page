@@ -1,294 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Styvora Landing Page Generator</title>
-
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f4f4;
-    padding:20px;
-}
-.container{
-    max-width:700px;
-    margin:auto;
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.1);
-}
-h2{
-    text-align:center;
-    margin-bottom:20px;
-}
-input, textarea{
-    width:100%;
-    padding:10px;
-    margin-bottom:15px;
-    border-radius:6px;
-    border:1px solid #ccc;
-}
-button{
-    background:black;
-    color:white;
-    padding:12px;
-    width:100%;
-    border:none;
-    border-radius:30px;
-    font-size:16px;
-    cursor:pointer;
-    margin-bottom:10px;
-}
-button:hover{
-    background:#333;
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-<h2>Styvora Landing Page Generator</h2>
-
-<input type="text" id="title" placeholder="Product Title">
-<input type="file" id="imageFile" accept="image/*">
-<textarea id="description" placeholder="Product Description"></textarea>
-<textarea id="specs" placeholder="Specifications (one per line)"></textarea>
-<input type="text" id="link" placeholder="Affiliate Link">
-<input type="text" id="filename" placeholder="Slug (example: product-1)">
-
-<button onclick="generateHTML()">Generate HTML Code</button>
-<button onclick="publishToGitHub()">Publish to GitHub (Auto)</button>
-
-</div>
-
-<script>
-const WORKER_API_URL = "https://styvora-publisher.deepkoley156.workers.dev/";
-
-let generatedCode = "";
-
-function generateHTML(){
-
-let title = document.getElementById("title").value.trim();
-let descriptionRaw = document.getElementById("description").value.trim();
-let description = descriptionRaw.replaceAll("\n","<br>");
-let specs = document.getElementById("specs").value.split("\n");
-let link = document.getElementById("link").value.trim();
-let slug = document.getElementById("filename").value.trim();
-
-if(!slug){
-    alert("Enter slug first!");
-    return;
-}
-
-let specList = "";
-specs.forEach(item=>{
-    if(item.trim() !== ""){
-        specList += `<li>${item.trim()}</li>\n`;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styvora Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #111;
+      padding: 20px;
     }
-});
-
-generatedCode = `
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Styvora | ${title}</title>
-<meta name="description" content="${descriptionRaw}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{
-  font-family:'Inter',sans-serif;
-  background:#ffffff;
-  color:#111;
-  line-height:1.6;
-}
-.wrapper{
-  max-width:720px;
-  margin:auto;
-  padding:40px 20px 120px;
-}
-.brand{
-  text-align:center;
-  font-size:14px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  margin-bottom:40px;
-  color:#777;
-}
-.product-image{
-  width:100%;
-  border-radius:6px;
-  margin-bottom:35px;
-}
-h1{
-  font-size:26px;
-  font-weight:500;
-  margin-bottom:15px;
-}
-.description{
-  font-size:15px;
-  color:#444;
-  margin-bottom:30px;
-}
-.features{
-  margin-bottom:40px;
-}
-.features li{
-  list-style:none;
-  margin-bottom:10px;
-  font-size:14px;
-  color:#333;
-}
-.features li:before{
-  content:"– ";
-}
-.cta{
-  display:inline-block;
-  padding:14px 36px;
-  border:1px solid #111;
-  text-decoration:none;
-  color:#111;
-  font-weight:500;
-  transition:0.3s ease;
-}
-.cta:hover{
-  background:#111;
-  color:#fff;
-}
-.sticky{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#fff;
-  padding:15px;
-  border-top:1px solid #eee;
-}
-.sticky a{
-  display:block;
-  text-align:center;
-  padding:14px;
-  background:#111;
-  color:#fff;
-  text-decoration:none;
-  font-weight:500;
-}
-@media(min-width:768px){
-  .sticky{display:none;}
-}
-</style>
+    .wrap {
+      max-width: 680px;
+      margin: auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin: 0 0 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    input[type="url"],
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 999px;
+      background: #111;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #333;
+    }
+    .status {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 8px;
+      background: #f7f7f7;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <h1>Styvora Admin Panel</h1>
 
-<div class="wrapper">
+    <label for="affiliateLink">Affiliate Link</label>
+    <input type="url" id="affiliateLink" placeholder="Paste affiliate link">
 
-<div class="brand">
-Styvora | Women’s Fashion & Accessories
-</div>
+    <label for="imageFile">Upload Product Image</label>
+    <input type="file" id="imageFile" accept="image/*">
 
-<img src="images/${slug}.jpg" class="product-image" alt="${title}">
+    <button onclick="publishProduct()">Submit</button>
 
-<h1>${title}</h1>
+    <div class="status" id="statusBox">Ready.</div>
+  </div>
 
-<p class="description">
-${description}
-</p>
+  <script>
+    const WORKER_URL = "https://styvora-publisher.deepkoley156.workers.dev/";
 
-<ul class="features">
-${specList}
-</ul>
+    function setStatus(text) {
+      document.getElementById("statusBox").textContent = text;
+    }
 
-<a href="${link}" target="_blank" class="cta">
-Buy Now
-</a>
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
 
-</div>
+    async function publishProduct() {
+      const affiliateLink = document.getElementById("affiliateLink").value.trim();
+      const imageFile = document.getElementById("imageFile").files[0];
 
-<div class="sticky">
-<a href="${link}" target="_blank">
-Buy Now
-</a>
-</div>
+      if (!affiliateLink) {
+        setStatus("Please enter affiliate link.");
+        return;
+      }
 
-</body>
-</html>
-`;
+      if (!imageFile) {
+        setStatus("Please upload image.");
+        return;
+      }
 
-alert("Minimalist Landing Page Generated Successfully!");
-}
+      try {
+        setStatus("Uploading image and processing...");
 
-async function publishToGitHub(){
+        const imageBase64 = await fileToBase64(imageFile);
 
-let slug = document.getElementById("filename").value.trim();
-let imageFile = document.getElementById("imageFile").files[0];
-let title = document.getElementById("title").value.trim();
-let description = document.getElementById("description").value.trim();
-
-if(!slug){
-    alert("Enter slug!");
-    return;
-}
-
-if(!generatedCode){
-    alert("Generate HTML first!");
-    return;
-}
-
-if(!imageFile){
-    alert("Select image!");
-    return;
-}
-
-if(!title || !description){
-    alert("Title and description required!");
-    return;
-}
-
-let reader = new FileReader();
-reader.readAsDataURL(imageFile);
-
-reader.onload = async function(){
-
-    let base64Image = reader.result.split(",")[1];
-
-    try{
-
-        let response = await fetch(WORKER_API_URL,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                slug: slug,
-                title: title,
-                description: description,
-                content: generatedCode,
-                imageContent: base64Image
-            })
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            affiliateLink,
+            imageBase64,
+            imageMimeType: imageFile.type || "image/jpeg",
+            imageName: imageFile.name || "product.jpg"
+          })
         });
 
-        let result = await response.json();
+        const result = await response.json();
 
-        if(result.success){
-            alert("Published Successfully!\n\nPage: " + result.url + "\n\nRSS: " + result.rss);
-        }else{
-            alert("Error: " + result.error);
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Publish failed");
         }
 
-    }catch(error){
-        alert("Publish Failed:\n" + error.message);
+        setStatus(
+`Published successfully!
+
+Page URL:
+${result.pageUrl}
+
+RSS:
+${result.rssUrl}
+
+Title:
+${result.title}
+
+Description:
+${result.description}
+
+Hashtags:
+${result.hashtags}
+
+Slug:
+${result.slug}`
+        );
+      } catch (err) {
+        setStatus("Error:\n" + err.message);
+      }
     }
-
-};
-
-}
-</script>
-
+  </script>
 </body>
 </html>
