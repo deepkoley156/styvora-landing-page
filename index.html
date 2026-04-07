@@ -1,164 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Styvora Admin Panel</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #111;
-      padding: 20px;
-    }
-    .wrap {
-      max-width: 680px;
-      margin: auto;
-      background: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    }
-    h1 {
-      margin: 0 0 20px;
-      text-align: center;
-      font-size: 24px;
-    }
-    label {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    input[type="url"],
-    input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 16px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 999px;
-      background: #111;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #333;
-    }
-    .status {
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 8px;
-      background: #f7f7f7;
-      font-size: 14px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Styvora Admin Panel</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f6f6f6;
+    padding:20px;
+}
+.container{
+    max-width:600px;
+    margin:auto;
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+input{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:8px;
+    border:1px solid #ddd;
+}
+button{
+    width:100%;
+    padding:14px;
+    background:black;
+    color:white;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+    cursor:pointer;
+}
+button:hover{
+    background:#333;
+}
+#status{
+    margin-top:15px;
+    font-size:14px;
+    text-align:center;
+}
+.result-box{
+    margin-top:20px;
+    background:#fafafa;
+    padding:15px;
+    border-radius:8px;
+    font-size:14px;
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Styvora Admin Panel</h1>
 
-    <label for="affiliateLink">Affiliate Link</label>
-    <input type="url" id="affiliateLink" placeholder="Paste affiliate link">
+<div class="container">
 
-    <label for="imageFile">Upload Product Image</label>
-    <input type="file" id="imageFile" accept="image/*">
+<h2>Styvora Auto Publisher</h2>
 
-    <button onclick="publishProduct()">Submit</button>
+<input type="file" id="imageFile" accept="image/*">
+<input type="text" id="link" placeholder="Affiliate Link">
 
-    <div class="status" id="statusBox">Ready.</div>
-  </div>
+<button onclick="publish()">Publish (Auto AI)</button>
 
-  <script>
-    const WORKER_URL = "https://styvora-publisher.deepkoley156.workers.dev/";
+<div id="status"></div>
 
-    function setStatus(text) {
-      document.getElementById("statusBox").textContent = text;
-    }
+<div id="result" class="result-box" style="display:none;"></div>
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
+</div>
+
+<script>
+
+const WORKER_URL = "https://styvora-publisher.deepkoley156.workers.dev/";
+
+function fileToBase64(file){
+    return new Promise((resolve, reject)=>{
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onload = ()=> resolve(reader.result.split(",")[1]);
         reader.onerror = reject;
         reader.readAsDataURL(file);
-      });
+    });
+}
+
+async function publish(){
+
+    const file = document.getElementById("imageFile").files[0];
+    const link = document.getElementById("link").value.trim();
+    const status = document.getElementById("status");
+    const resultBox = document.getElementById("result");
+
+    if(!file){
+        alert("Upload image first");
+        return;
     }
 
-    async function publishProduct() {
-      const affiliateLink = document.getElementById("affiliateLink").value.trim();
-      const imageFile = document.getElementById("imageFile").files[0];
-
-      if (!affiliateLink) {
-        setStatus("Please enter affiliate link.");
+    if(!link){
+        alert("Enter affiliate link");
         return;
-      }
+    }
 
-      if (!imageFile) {
-        setStatus("Please upload image.");
-        return;
-      }
+    status.innerHTML = "⏳ Processing... (AI generating content)";
+    resultBox.style.display = "none";
 
-      try {
-        setStatus("Uploading image and processing...");
+    try{
 
-        const imageBase64 = await fileToBase64(imageFile);
+        const base64 = await fileToBase64(file);
 
-        const response = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            affiliateLink,
-            imageBase64,
-            imageMimeType: imageFile.type || "image/jpeg",
-            imageName: imageFile.name || "product.jpg"
-          })
+        const res = await fetch(WORKER_URL,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                affiliateLink: link,
+                imageBase64: base64,
+                imageMimeType: file.type,
+                imageName: file.name
+            })
         });
 
-        const result = await response.json();
+        const data = await res.json();
 
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || "Publish failed");
+        if(!data.success){
+            status.innerHTML = "❌ Error: " + data.error;
+            return;
         }
 
-        setStatus(
-`Published successfully!
+        status.innerHTML = "✅ Published Successfully!";
 
-Page URL:
-${result.pageUrl}
+        resultBox.style.display = "block";
+        resultBox.innerHTML = `
+<b>Page:</b><br>
+<a href="${data.pageUrl}" target="_blank">${data.pageUrl}</a><br><br>
 
-RSS:
-${result.rssUrl}
+<b>Title:</b><br>${data.title}<br><br>
 
-Title:
-${result.title}
+<b>Description:</b><br>${data.description}<br><br>
 
-Description:
-${result.description}
+<b>Hashtags:</b><br>${data.hashtags}<br><br>
 
-Hashtags:
-${result.hashtags}
+<b>RSS:</b><br>
+<a href="${data.rssUrl}" target="_blank">${data.rssUrl}</a>
+`;
 
-Slug:
-${result.slug}`
-        );
-      } catch (err) {
-        setStatus("Error:\n" + err.message);
-      }
+    }catch(err){
+        status.innerHTML = "❌ Failed: " + err.message;
     }
-  </script>
+
+}
+
+</script>
+
 </body>
 </html>
